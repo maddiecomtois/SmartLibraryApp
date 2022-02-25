@@ -1,6 +1,10 @@
 # SmartLibraryApp
 
 ### To Run the project: 
+Download the Ionic CLI with NPM 
+```
+npm install -g @ionic/cli
+```
 
 Start the Ionic Server <br>
    ```
