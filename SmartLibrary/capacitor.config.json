@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "SmartLibrary",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}

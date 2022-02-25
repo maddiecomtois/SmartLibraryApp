@@ -1,0 +1,7 @@
+{
+  "name": "SmartLibrary",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
