@@ -15,4 +15,9 @@
   <br>
   <ion-button [routerLink]="['/search']"> Find a book </ion-button>
 
+  <ion-button (click)=scan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
+
+  <p [innerHTML]="scanStatus"></p>
+  <p [innerHTML]="device"></p>
+
 </ion-content>
