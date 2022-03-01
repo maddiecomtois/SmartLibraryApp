@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
-import { BleClient } from '@capacitor-community/bluetooth-le';
-import { BLE } from '@ionic-native/ble';
+import { Component, NgZone } from '@angular/core';
+import { BLE } from '@ionic-native/ble/ngx';
 
 @Component({
   selector: 'app-home',
@@ -10,36 +9,20 @@ import { BLE } from '@ionic-native/ble';
 export class HomePage {
   devices:any[] = [];
   scanStatus:String = '';
-  device:String = '';
 
-  constructor() {}
+  constructor(private ble: BLE, private ngZone: NgZone) {}
 
-  async scan() {
-    this.devices = [];
-    try{
-      await BleClient.initialize();
-      await BleClient.requestLEScan(
-        {
-          services: [],
-        },
-        (result) => {
-          this.scanStatus = 'Scanning';
-          console.log("Scan ", result);
-          this.devices = result[0];
-        }
-      );
-      setTimeout(async () =>{
-        await BleClient.stopLEScan();
-        console.log("Stop Scanning");
-        this.scanStatus = 'Done Scanning';
-      }, 10000);
-    }
-    catch(error){
-      console.log(error);
-    }
+  scan(){
+    this.devices = []
+    this.ble.scan([], 15).subscribe(
+      device => this.deviceFound(device)
+    );
   }
 
-  anotherScan(){
-
+  deviceFound(device){
+    this.scanStatus = device.name;
+    this.ngZone.run(() => {
+      this.devices.push(device);
+    })
   }
 }
