@@ -15,9 +15,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,
   HttpClientModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy},BookService],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule],
-  providers: [BLE, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [BLE, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },BookService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

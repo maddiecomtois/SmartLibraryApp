@@ -1,4 +1,3 @@
-import { Component } from '@angular/core';
 import { Book } from '../search/search.page';
 import { BookService } from '../services/book.service';
 import { Component, NgZone } from '@angular/core';
