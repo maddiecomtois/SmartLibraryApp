@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Book } from '../search/search.page';
+import { BookService } from '../services/book.service';
 
 @Component({
   selector: 'app-home',
@@ -6,7 +8,16 @@ import { Component } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  public bookList : Book[]=[];
+  constructor(public bookService : BookService) {
+    this.loadBooks();
+  }
 
-  constructor() {}
+  loadBooks(){
+    this.bookService.getMyBooks().subscribe((result:Book[]) => {
+      console.log(result);
+      this.bookList = result;
+    });
+  }
 
 }

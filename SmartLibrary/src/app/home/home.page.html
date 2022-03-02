@@ -12,7 +12,13 @@
   <br>
   <div> Your books: </div>
   <br>
+  <ion-list>
+    <ion-item style="color:white" *ngFor = "let book of bookList">
+      <ion-label>{{book?.title}}</ion-label>
+    </ion-item>
+  </ion-list>
   <br>
   <ion-button [routerLink]="['/search']"> Find a book </ion-button>
 
 </ion-content>
+
