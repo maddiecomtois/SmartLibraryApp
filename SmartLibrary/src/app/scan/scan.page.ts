@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 
 @Component({
   selector: 'app-scan',
@@ -11,5 +11,4 @@ export class ScanPage implements OnInit {
 
   ngOnInit() {
   }
-
 }

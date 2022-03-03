@@ -6,4 +6,16 @@
 
 <ion-content>
   <ion-button [routerLink]="['/scan']"> Scan book </ion-button>
+
+  <ion-button (click)=scan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
+
+  <p [innerHTML]="scanStatus"></p>
+  <ion-list>
+    <ion-card-content ion-item *ngFor="let device of devices">
+      <p>{{device.localName || "Unnamed"}}</p>
+      <p>{{device.uuids}}</p>
+      <p>RSSI: {{device.rssi}}</p>
+    </ion-card-content>
+  </ion-list>
+
 </ion-content>
