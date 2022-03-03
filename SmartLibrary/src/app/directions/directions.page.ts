@@ -1,7 +1,4 @@
 import { Component, OnInit, NgZone } from '@angular/core';
-import { BLE } from '@ionic-native/ble/ngx';
-//import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BleClient } from '@capacitor-community/bluetooth-le';
 
 
@@ -14,38 +11,13 @@ export class DirectionsPage implements OnInit {
   devices:any[] = []
   scanStatus:String = '';
   
-  constructor(private ble: BLE, private ngZone: NgZone, private androidPermissions: AndroidPermissions) { }
+  constructor(private ngZone: NgZone) { }
 
   ngOnInit() {
 
   }
 
-  permissionToScan(){
-    
-  }
-
-  scan(){
-    this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.BLUETOOTH_SCAN).then(
-      result => {
-        console.log("PERMISSION: ", result.hasPermission)
-        if(!result.hasPermission){
-          this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.BLUETOOTH_SCAN);
-        }
-        else{
-          this.devices = []
-          this.ble.scan([], 15).subscribe(
-            device => {
-              this.scanStatus = 'device found';
-              this.deviceFound(device)
-            }
-          );
-        }
-      },
-      err => this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.BLUETOOTH_SCAN)
-    )
-  }
-
-  async anotherScan(){
+  async scan(){
     await BleClient.initialize({ androidNeverForLocation: true });
     await BleClient.requestLEScan(
       {
