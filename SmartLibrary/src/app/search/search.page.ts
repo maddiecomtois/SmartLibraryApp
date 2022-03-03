@@ -30,4 +30,5 @@ export interface Book {
   date: string;
   createdAt: Date;
   updatedAt: Date;
+  available: boolean;
 }
