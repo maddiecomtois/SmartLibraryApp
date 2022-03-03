@@ -17,10 +17,10 @@
           <ion-label>{{book?.title}}</ion-label>
         </ion-item>
         <ion-list slot="content">
-          <ion-item>
-            <ion-label>Available: {{book?.available}}</ion-label>
+          <ion-item *ngIf="!book?.available">
+            <ion-label>Not currently available </ion-label>
           </ion-item>
-          <ion-item *ngIf=true>
+          <ion-item *ngIf="book?.available">
             <ion-button [routerLink]="['/directions']"> Get directions </ion-button>
           </ion-item>
         </ion-list>
