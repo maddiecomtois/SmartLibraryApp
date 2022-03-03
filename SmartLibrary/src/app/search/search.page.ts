@@ -2,34 +2,33 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable, combineLatest } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-
+import { BookService } from '../services/book.service';
 @Component({
   selector: 'app-search',
   templateUrl: './search.page.html',
-  styleUrls: ['./search.page.scss'],
+  styleUrls: ['./search.page.scss']
 })
 export class SearchPage implements OnInit {
-   public searchField: FormControl;
-   public foodList$: Observable<FoodItem[]>;
+  public searchField: FormControl;
+  public foodList$: Observable<FoodItem[]>;
+  public bookList: Book[];
 
-  book1:Book = {name:"book1", available:true}
-  book2:Book = {name:"book2", available:false}
-  book3:Book = {name:"book3", available:true}
-  books = [
-    this.book1,
-    this.book2,
-    this.book3
-  ]
 
-  constructor() {
+
+  constructor(private bookSerice: BookService) {
     this.searchField = new FormControl('');
+
   }
 
   async ngOnInit() {
     const searchTerm$ = this.searchField.valueChanges.pipe(
       startWith(this.searchField.value)
     );
-    
+    this.bookSerice.getBooks().subscribe((result:Book[]) => {
+      console.log(result);
+      this.bookList = result;
+    });
+
     /*
     // tutorial: https://jsmobiledev.com/article/searchbar-firebase/
     const foodList$ = Observable.create(this.foods);
@@ -44,7 +43,7 @@ export class SearchPage implements OnInit {
       )
     );
     */
-  
+
   }
 
 }
@@ -53,7 +52,12 @@ interface FoodItem {
   name: string;
 }
 
-interface Book {
-  name: string;
-  available: boolean;
+export interface Book {
+  bookId: number;
+  title: string;
+  author: string;
+  transaction: string;
+  date: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
