@@ -1,20 +1,17 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Search a book</ion-title>
+    <ion-title>Search the Catalogue</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   
-  <ion-searchbar [formControl]="searchField" debounce="100" inputmode="search"></ion-searchbar>
+  <ion-searchbar showCancelButton="focus" [(ngModel)]="searchTerm" debounce="100" animated></ion-searchbar>
   <ion-list lines="none">
-    <!--
-    <ion-item *ngFor="let foodItem of foodList$ | async">
-      <ion-label>{{ foodItem.name }}</ion-label>
-    </ion-item>
-    -->
-    <ion-accordion-group *ngFor="let book of bookList">
-      <!--<ion-label>{{ book.name }}</ion-label>-->
+    <ion-accordion-group *ngFor="let book of bookList | filter:searchTerm">
       <ion-accordion>
         <ion-item slot="header">
           <ion-label>{{book?.title}}</ion-label>
@@ -31,5 +28,4 @@
     </ion-accordion-group>
   </ion-list>
   
-
 </ion-content>

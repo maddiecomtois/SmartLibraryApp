@@ -13,7 +13,7 @@
   <div> Your books: </div>
   <br>
   <ion-list>
-    <ion-item style="color:white" *ngFor = "let book of bookList">
+    <ion-item *ngFor = "let book of bookList">
       <ion-label>{{book?.title}}</ion-label>
     </ion-item>
   </ion-list>
