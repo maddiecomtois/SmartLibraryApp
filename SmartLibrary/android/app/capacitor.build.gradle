@@ -14,9 +14,9 @@ dependencies {
     implementation project(':capacitor-haptics')
     implementation project(':capacitor-keyboard')
     implementation project(':capacitor-status-bar')
-
+    implementation "com.android.support:support-core-utils:26+"
 }
-
+apply from: "../../node_modules/com.unarin.cordova.beacon/src/android/cordova-plugin-ibeacon.gradle"
 
 if (hasProperty('postBuildExtras')) {
   postBuildExtras()
