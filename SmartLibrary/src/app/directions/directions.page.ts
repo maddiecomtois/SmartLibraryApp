@@ -10,11 +10,25 @@ import { BleClient } from '@capacitor-community/bluetooth-le';
 export class DirectionsPage implements OnInit {
   devices:any[] = []
   scanStatus:String = '';
+  distanceToBook:number = 0;
+  map:any[][] = [[0, 0, 0],
+                [100, 100, 100],
+                [200, 200, 200],
+                [300, 300, 300],
+                [400, 400, 400],
+                [500, 500, 500]]
+                
+  displayMap:any[][] = [[0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]]
   
   constructor(private ngZone: NgZone) { }
 
   ngOnInit() {
-
+    this.updateMap();
   }
 
   async scan(){
@@ -40,6 +54,31 @@ export class DirectionsPage implements OnInit {
     this.ngZone.run(() => {
       this.devices.push(device);
     })
+  }
+  
+  updateMap() {
+    this.distanceToBook = 500;
+    let currentPositionY = 5;
+    let currentPositionX = 1;
+    
+    setInterval(() => {
+      
+      if (this.distanceToBook < this.map[currentPositionY][currentPositionX]) {
+        this.displayMap[currentPositionY][currentPositionX] = 0;
+        currentPositionY = currentPositionY - 1;
+      }
+      
+      if(currentPositionY < 0) {
+        console.log("book reached");
+      }
+      else {
+        this.distanceToBook = this.distanceToBook - 50;
+        console.log("Distance to go: ", this.distanceToBook);
+        this.displayMap[currentPositionY][currentPositionX] = 1;
+      }
+      
+    }, 2000);
+
   }
 
 }

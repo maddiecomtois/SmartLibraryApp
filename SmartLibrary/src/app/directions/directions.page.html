@@ -1,10 +1,22 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>directions</ion-title>
+    <ion-title>Directions</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  
+  <div> Distance to go: {{distanceToBook}}m </div><br>
+  <ion-icon name="pin-outline"></ion-icon><ion-icon name="book-outline"></ion-icon>
+  <div class="mapContainer" *ngFor="let i of displayMap">
+      
+      <div *ngFor="let j of i">
+          <div class="mapCell" *ngIf="j == 1"> <ion-icon name="man-outline"></ion-icon></div>
+          <div class="mapCell" *ngIf="j == 0"> {{j}}</div>
+      </div>
+  </div>
+  
+  
   <ion-button [routerLink]="['/scan']"> Scan book </ion-button>
 
   <ion-button (click)=scan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
