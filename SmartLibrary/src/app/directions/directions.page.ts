@@ -11,6 +11,7 @@ export class DirectionsPage implements OnInit {
   devices:any[] = []
   scanStatus:String = '';
   distanceToBook:number = 0;
+  bookReached:boolean = false;
   map:any[][] = [[0, 0, 0],
                 [100, 100, 100],
                 [200, 200, 200],
@@ -70,6 +71,7 @@ export class DirectionsPage implements OnInit {
       
       if(currentPositionY < 0) {
         console.log("book reached");
+        this.bookReached = true;
       }
       else {
         this.distanceToBook = this.distanceToBook - 50;
