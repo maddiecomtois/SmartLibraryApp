@@ -7,7 +7,7 @@
 <ion-content>
   <ion-button [routerLink]="['/scan']"> Scan book </ion-button>
 
-  <ion-button (click)=ibeaconScan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
+  <ion-button (click)=smartBeaconScan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
 
   <p [innerHTML]="scanStatus"></p>
   <ion-list>
