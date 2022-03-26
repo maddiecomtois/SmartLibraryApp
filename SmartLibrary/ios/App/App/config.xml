@@ -6,8 +6,8 @@
     <param name="ios-package" value="BLECentralPlugin" onload="$IOS_INIT_ON_LOAD"/>
   </feature>
 
-  <feature name="NfcPlugin">
-    <param name="ios-package" value="NfcPlugin"/>
+  <feature name="Compass">
+    <param name="ios-package" value="CDVCompass"/>
   </feature>
 
   

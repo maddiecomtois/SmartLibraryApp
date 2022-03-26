@@ -1,5 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { BleClient } from '@capacitor-community/bluetooth-le';
+import { DeviceOrientation, DeviceOrientationCompassHeading } from '@awesome-cordova-plugins/device-orientation/ngx';
+
 
 
 @Component({
@@ -10,25 +12,38 @@ import { BleClient } from '@capacitor-community/bluetooth-le';
 export class DirectionsPage implements OnInit {
   devices:any[] = []
   scanStatus:String = '';
-  distanceToBook:number = 0;
   bookReached:boolean = false;
-  map:any[][] = [[0, 0, 0],
-                [100, 100, 100],
-                [200, 200, 200],
-                [300, 300, 300],
-                [400, 400, 400],
-                [500, 500, 500]]
-                
-  displayMap:any[][] = [[0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]]
   
-  constructor(private ngZone: NgZone) { }
+  floorPlan:string[][] = [];
+  beaconDistance:number = 0;
+  beaconX = 3;
+  beaconY = 30;
+  
+  constructor(private ngZone: NgZone, /*private deviceOrientation: DeviceOrientation*/) { }
 
   ngOnInit() {
+    /*
+    this.deviceOrientation.getCurrentHeading().then(
+      (data: DeviceOrientationCompassHeading) => console.log(data),
+      (error: any) => console.log(error)
+    );
+    
+    let subscription = this.deviceOrientation.watchHeading().subscribe(
+      (data: DeviceOrientationCompassHeading) => console.log(data)
+    );
+    */
+    
+    //subscription.unsubscribe();
+    
+    // create a 25m x 10m grid using 0.5m blocks
+    for(let i:number = 0; i < 50; i++) {
+        this.floorPlan[i] = [];
+        for(let j:number = 0; j< 20; j++) {
+            this.floorPlan[i][j] = '.';
+        }
+    }
+    this.floorPlan[this.beaconY][this.beaconX] = "@";
+    console.log(this.floorPlan);
     this.updateMap();
   }
 
@@ -57,30 +72,45 @@ export class DirectionsPage implements OnInit {
     })
   }
   
+  /*
+    Y range: {0-49} ~25m
+    X range: {0-19} ~10m
+  */
   updateMap() {
-    this.distanceToBook = 500;
-    let currentPositionY = 5;
-    let currentPositionX = 1;
+    this.beaconDistance = 15.2;
+    let currentPositionY = 49;
+    let currentPositionX = 10;
+    let previousDistance = this.beaconDistance;
     
+    // function that automatically decreases beacon distance by 0.5m every 1 second
     setInterval(() => {
-      
-      if (this.distanceToBook < this.map[currentPositionY][currentPositionX]) {
-        this.displayMap[currentPositionY][currentPositionX] = 0;
-        currentPositionY = currentPositionY - 1;
-      }
-      
-      if(currentPositionY < 0) {
+      // check if person has reached the book (currently set at a random threshold or if they are on the same square)
+      if(this.beaconDistance < 0.01 || (currentPositionX == this.beaconX && currentPositionY == this.beaconY)) {
         console.log("book reached");
         this.bookReached = true;
       }
-      else {
-        this.distanceToBook = this.distanceToBook - 50;
-        console.log("Distance to go: ", this.distanceToBook);
-        this.displayMap[currentPositionY][currentPositionX] = 1;
+      // if person moves towards the book (smaller beacon distance)
+      else if(this.beaconDistance < previousDistance) {
+        this.floorPlan[currentPositionY][currentPositionX] = '.'        // remove the user from the current position on the map
+        let distanceDifference = previousDistance - this.beaconDistance;     // calculate how much the person moved
+        let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
+        currentPositionY -= distanceToMove;                             // update map by moving the person forward
+      }
+      // if person moves away from the book (greater beacon distance)
+      else if (this.beaconDistance > previousDistance) {
+        this.floorPlan[currentPositionY][currentPositionX] = '.'        // remove the user from the current position on the map
+        let distanceDifference = previousDistance - this.beaconDistance;     // calculate how much the person moved
+        let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
+        currentPositionY += distanceToMove;                             // update map by moving the person backwards
       }
       
-    }, 2000);
-
+      previousDistance = this.beaconDistance;                                // update distance to book 
+      this.floorPlan[currentPositionY][currentPositionX] = '1'          // reset the user to the new position on the map
+      
+      this.beaconDistance -= 0.5;
+        
+    }, 1000);
+    
   }
 
 }

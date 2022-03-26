@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-
+  <!----------------------------------------------- BLE Scan --------------------------------------------------------->
   Scan BLE device to get distance:<br>
   <ion-button (click)=scan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
 
@@ -18,15 +18,18 @@
     </ion-card-content>
   </ion-list>
   
-  <div> Distance to go: {{distanceToBook}}m </div><br>
-  <div style="padding-left:40px"><ion-icon name="pin-outline"></ion-icon><ion-icon name="book-outline"></ion-icon></div>
-  <div class="mapContainer" *ngFor="let i of displayMap">
+  <!----------------------------------------------- Map --------------------------------------------------------->
+
+  <div> Distance to go: {{beaconDistance}}m </div><br>
+  <div class= "mapContainer" *ngFor="let i of floorPlan">
       <div *ngFor="let j of i">
-          <div class="mapCell" *ngIf="j == 1"> <ion-icon name="man-outline"></ion-icon></div>
-          <div class="mapCell" *ngIf="j == 0"> {{j}}</div>
+          <div *ngIf="j == '@'" class="mapCell"><ion-icon name="book-outline"></ion-icon></div>
+          <div *ngIf="j == '1'" class="mapCell"><ion-icon name="man-outline"></ion-icon></div>
+          <div *ngIf="j != '1' && j != '@'" class="mapCell">{{j}}</div>
       </div>
   </div>
   
+  <!----------------------------------------------- NFC Scan --------------------------------------------------------->
   <div *ngIf="bookReached">
     Book found, click to check out:
     <ion-button [routerLink]="['/scan']"> Scan book </ion-button>
