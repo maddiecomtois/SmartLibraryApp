@@ -21,19 +21,6 @@ export class ScanPage implements OnInit {
   }
   
   async scanTag() {
-    // Read NFC Tag - iOS
-    // On iOS, a NFC reader session takes control from your app while scanning tags then returns a tag
-    if(this.platform.is('ios')) {
-      console.log("ios detected")
-      try {
-          let tag = await this.nfc.scanNdef();
-          console.log(JSON.stringify(tag));
-          this.scanResponse = JSON.stringify(tag);
-       } catch (err) {
-           this.scanResponse = 'Error reading tag'
-       }
-    }
-    
     // Read NFC Tag - Android
     // Once the reader mode is enabled, any tags that are scanned are sent to the subscriber
     if(this.platform.is('android')) {

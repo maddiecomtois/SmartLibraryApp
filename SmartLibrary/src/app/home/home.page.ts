@@ -1,7 +1,6 @@
 import { Book } from '../search/search.page';
 import { BookService } from '../services/book.service';
 import { Component, NgZone } from '@angular/core';
-import { BLE } from '@ionic-native/ble/ngx';
 
 @Component({
   selector: 'app-home',
@@ -10,11 +9,12 @@ import { BLE } from '@ionic-native/ble/ngx';
 })
 export class HomePage {
   public bookList : Book[]=[];
-  constructor(public bookService : BookService,private ble: BLE, private ngZone: NgZone) {
+  constructor(public bookService : BookService, private ngZone: NgZone) {
     this.loadBooks();
   }
 
   loadBooks(){
+    //console.log(localStorage.getItem("sessionToken"));
     this.bookService.getMyBooks().subscribe((result:Book[]) => {
       console.log(result);
       this.bookList = result;

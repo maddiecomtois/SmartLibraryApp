@@ -1,0 +1,10 @@
+{
+  "com.tcd.iot.smartbeacon": {
+    "source": {
+      "type": "registry",
+      "id": "https://github.com/chaitu25/SmartBeaconPlugin.git"
+    },
+    "is_top_level": true,
+    "variables": {}
+  }
+}
