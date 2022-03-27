@@ -13,7 +13,7 @@
 
     <ion-card-content>
       <ion-item>
-        <ion-label> Username </ion-label>
+        <ion-label> Email </ion-label>
         <ion-input [(ngModel)]="user.username" placeholer="username"></ion-input>
       </ion-item>
       <br>
@@ -26,5 +26,7 @@
       <ion-button expand="block" color="secondary" (click)="register()"> Register </ion-button>
     </ion-card-content>
   </ion-card>
+  <p [innerHTML]="registerStatus"></p>
+
 
 </ion-content>
