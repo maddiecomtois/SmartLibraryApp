@@ -14,12 +14,12 @@
     <ion-card-content>
       <ion-item>
         <ion-label> Email </ion-label>
-        <ion-input [(ngModel)]="user.username" placeholer="username"></ion-input>
+        <ion-input [(ngModel)]="user.username" placeholer="username" value="ciara@test.ie"></ion-input>
       </ion-item>
       <br>
       <ion-item>
         <ion-label> Password </ion-label>
-        <ion-input [(ngModel)]="user.password" placeholer="password" type="password"></ion-input>
+        <ion-input [(ngModel)]="user.password" placeholer="password" type="password" value="1234"></ion-input>
       </ion-item>
       <br>
       <ion-button expand="block" (click)="logIn()"> Login </ion-button>

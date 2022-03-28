@@ -5,18 +5,18 @@
 </ion-header>
 
 <ion-content>
-  <ion-button [routerLink]="['/scan']"> Scan book </ion-button>
-
   <!----------------------------------------------- iBeacon Scan --------------------------------------------------------->
   Scan for beacon device to get distance:<br>
   <ion-button (click)=smartBeaconScan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
 
   <p [innerHTML]="scanStatus"></p>
+  <p>You are heading: </p><p [innerHTML]="heading"></p>
   <ion-list>
     <ion-card-content ion-item *ngFor="let device of devices">
       <p>{{device.localName || "Unnamed"}}</p>
       <p>{{device.uuids}}</p>
       <p>RSSI: {{device.rssi}}</p>
+      <p>Distance: {{device.distance}}</p>
     </ion-card-content>
   </ion-list>
   

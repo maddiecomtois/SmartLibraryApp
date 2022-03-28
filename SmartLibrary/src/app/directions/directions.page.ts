@@ -1,6 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { SmartBeaconPlugin } from '@ionic-native/smart-beacon-plugin/ngx';
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@awesome-cordova-plugins/device-orientation/ngx';
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 
 @Component({
   selector: 'app-directions',
@@ -12,25 +13,40 @@ export class DirectionsPage implements OnInit {
   devices:any[] = []
   scanStatus:String = '';
   bookReached:boolean = false;
-  
+  //heading:number = -1;
+  permissions:any[] = [this.androidPermissions.PERMISSION.BLUETOOTH_SCAN, this.androidPermissions.PERMISSION.FOREGROUND_SERVICE, this.androidPermissions.PERMISSION.INTERNET, this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION, this.androidPermissions.PERMISSION.ACCESS_BACKGROUND_LOCATION] 
+
+  heading:String = '';
   floorPlan:string[][] = [];
   beaconDistance:number = 0;
   beaconX = 3;
   beaconY = 30;
   
-  constructor(private ngZone: NgZone, /*private deviceOrientation: DeviceOrientation*/, private smartBeacon: SmartBeaconPlugin) { }
+  constructor(private ngZone: NgZone, private deviceOrientation: DeviceOrientation, private smartBeacon: SmartBeaconPlugin, private androidPermissions: AndroidPermissions) { }
 
   ngOnInit() {
-    /*
-    this.deviceOrientation.getCurrentHeading().then(
-      (data: DeviceOrientationCompassHeading) => console.log(data),
-      (error: any) => console.log(error)
-    );
     
-    let subscription = this.deviceOrientation.watchHeading().subscribe(
-      (data: DeviceOrientationCompassHeading) => console.log(data)
+    /*this.deviceOrientation.getCurrentHeading().then(
+      (data: DeviceOrientationCompassHeading) => {
+        this.heading = data.magneticHeading;
+      },
+      (error: any) => console.log(error)
+    );*/
+
+    let options = {
+      //every 1 second
+      frequency: 1000
+    };
+    
+    this.deviceOrientation.watchHeading(options).subscribe(
+      (data: DeviceOrientationCompassHeading) => {
+        //this.heading = data.trueHeading;
+        this.heading = this.getDirectionFromHeading(data.trueHeading);
+      },
+      (error: any) => {
+        console.log(error);
+      }
     );
-    */
     
     //subscription.unsubscribe();
     
@@ -46,6 +62,35 @@ export class DirectionsPage implements OnInit {
     this.updateMap();
   }
 
+  getDirectionFromHeading(heading){
+    if((heading >= 0 && heading <= 21) || (heading >= 337 && heading <= 360)){
+      return "North";
+    }
+    else if(heading >=157 && heading <= 201){
+      return "South";
+    }
+    else if(heading >= 68 && heading <= 111){
+      return "East";
+    }
+    else if(heading >= 249 && heading <= 292){
+      return "West";
+    }
+    else if(heading >= 22 && heading <= 67){
+      return "North East";
+    }
+    else if(heading >= 112 && heading <= 156){
+      return "South East";
+    }
+    else if(heading >= 293 && heading <= 336){
+      return "North West";
+    }
+    else if(heading >= 202 && heading <= 248){
+      return "South West";
+    }
+  }
+
+
+
   onScanResult(result){
     console.log("In Scan Result");
     for(var i = 0; i < result.length; i++){
@@ -56,10 +101,20 @@ export class DirectionsPage implements OnInit {
   }
 
   smartBeaconScan(){
-    this.scanStatus = "Starting Scan";
-    this.smartBeacon.scan().then(result => {
-      this.onScanResult(result);
-    })
+    //check permission
+    this.androidPermissions.hasPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION).then(
+      result => {
+        if(result.hasPermission){
+          this.scanStatus = "Starting Scan";
+          this.smartBeacon.scan().then(result => {
+            this.onScanResult(result);
+          });
+        }
+        else{
+          this.androidPermissions.requestPermissions(this.permissions)
+        } 
+      }
+    );
   }
 
   deviceFound(device){
