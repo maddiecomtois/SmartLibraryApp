@@ -13,8 +13,9 @@
   <ion-list>
     <ion-card-content ion-item *ngFor="let device of devices">
       <p>{{device.localName || "Unnamed"}}</p>
-      <p>{{device.uuids}}</p>
+      <p>UUID: {{device.uuid}}</p>
       <p>RSSI: {{device.rssi}}</p>
+      <p>DISTANCE: {{device.distance}}</p>
     </ion-card-content>
   </ion-list>
 

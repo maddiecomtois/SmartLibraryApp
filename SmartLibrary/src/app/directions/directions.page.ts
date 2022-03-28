@@ -1,6 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { SmartBeaconPlugin } from '@ionic-native/smart-beacon-plugin/ngx';
-
+import { from } from 'rxjs';
 @Component({
   selector: 'app-directions',
   templateUrl: './directions.page.html',
@@ -28,9 +28,18 @@ export class DirectionsPage implements OnInit {
 
   smartBeaconScan(){
     this.scanStatus = "Starting Scan";
-    this.smartBeacon.scan().then(result => {
-      this.onScanResult(result);
-    })
+    // const beaconScanObserver = from(this.smartBeacon.scan())
+    // beaconScanObserver.subscribe(
+    //   result => {
+    //       this.onScanResult(result);
+    //     })
+    setInterval(() => {
+      console.log('In set interval')
+      this.smartBeacon.scan().then(result => {
+        this.onScanResult(result);
+      })
+    }, 2000);
+   
   }
 
   deviceFound(device){
