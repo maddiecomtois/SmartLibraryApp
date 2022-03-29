@@ -19,6 +19,12 @@
       <p>Distance: {{device.distance}}</p>
     </ion-card-content>
   </ion-list>
+
+  <!----------------------------------------------- NFC Scan --------------------------------------------------------->
+  <div *ngIf="bookReached">
+    Book found, click to check out:
+    <ion-button [routerLink]="['/scan']"> Scan book </ion-button>
+  </div>
   
   <!----------------------------------------------- Map --------------------------------------------------------->
 
@@ -29,12 +35,6 @@
           <div *ngIf="j == '1'" class="mapCell"><ion-icon name="man-outline"></ion-icon></div>
           <div *ngIf="j != '1' && j != '@'" class="mapCell">{{j}}</div>
       </div>
-  </div>
-  
-  <!----------------------------------------------- NFC Scan --------------------------------------------------------->
-  <div *ngIf="bookReached">
-    Book found, click to check out:
-    <ion-button [routerLink]="['/scan']"> Scan book </ion-button>
   </div>
 
 </ion-content>
