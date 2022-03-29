@@ -1,5 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { SmartBeaconPlugin } from '@ionic-native/smart-beacon-plugin/ngx';
+import { from } from 'rxjs';
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@awesome-cordova-plugins/device-orientation/ngx';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 
@@ -96,6 +97,19 @@ export class DirectionsPage implements OnInit {
   }
 
   smartBeaconScan(){
+    this.scanStatus = "Starting Scan";
+    // const beaconScanObserver = from(this.smartBeacon.scan())
+    // beaconScanObserver.subscribe(
+    //   result => {
+    //       this.onScanResult(result);
+    //     })
+    setInterval(() => {
+      console.log('In set interval')
+      this.smartBeacon.scan().then(result => {
+        this.onScanResult(result);
+      })
+    }, 2000);
+   
     //check permission
     this.androidPermissions.hasPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION).then(
       result => {
