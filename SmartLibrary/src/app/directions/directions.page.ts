@@ -1,5 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { SmartBeaconPlugin } from '@ionic-native/smart-beacon-plugin/ngx';
+import { from } from 'rxjs';
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@awesome-cordova-plugins/device-orientation/ngx';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 
@@ -89,26 +90,36 @@ export class DirectionsPage implements OnInit {
     }
   }
 
-
-
   onScanResult(result){
-    console.log("In Scan Result");
-    for(var i = 0; i < result.length; i++){
-      let beacon = result[i];
-      console.log("I found a beacon");
-      this.deviceFound(beacon);
-    }
+    console.log(result.length);
+    let latestBeacon = result[result.length - 1];
+    this.scanStatus = latestBeacon.distance;
   }
 
   smartBeaconScan(){
+    this.scanStatus = "Starting Scan";
+    // const beaconScanObserver = from(this.smartBeacon.scan())
+    // beaconScanObserver.subscribe(
+    //   result => {
+    //       this.onScanResult(result);
+    //     })
+    setInterval(() => {
+      console.log('In set interval')
+      this.smartBeacon.scan().then(result => {
+        this.onScanResult(result);
+      })
+    }, 2000);
+   
     //check permission
     this.androidPermissions.hasPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION).then(
       result => {
         if(result.hasPermission){
-          this.scanStatus = "Starting Scan";
-          this.smartBeacon.scan().then(result => {
-            this.onScanResult(result);
-          });
+          //this.scanStatus = "Starting Scan";
+          setInterval(() => {
+            this.smartBeacon.scan().then(result => {
+              this.onScanResult(result);
+            });
+          }, 1000);
         }
         else{
           this.androidPermissions.requestPermissions(this.permissions)
@@ -129,39 +140,34 @@ export class DirectionsPage implements OnInit {
     X range: {0-19} ~10m
   */
   updateMap() {
-    this.beaconDistance = 15.2;
+    
     let currentPositionY = 49;
     let currentPositionX = 10;
     let previousDistance = this.beaconDistance;
     
     // function that automatically decreases beacon distance by 0.5m every 1 second
-    setInterval(() => {
-      // check if person has reached the book (currently set at a random threshold or if they are on the same square)
-      if(this.beaconDistance < 0.01 || (currentPositionX == this.beaconX && currentPositionY == this.beaconY)) {
-        console.log("book reached");
-        this.bookReached = true;
-      }
-      // if person moves towards the book (smaller beacon distance)
-      else if(this.beaconDistance < previousDistance) {
-        this.floorPlan[currentPositionY][currentPositionX] = '.'        // remove the user from the current position on the map
-        let distanceDifference = previousDistance - this.beaconDistance;     // calculate how much the person moved
-        let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
-        currentPositionY -= distanceToMove;                             // update map by moving the person forward
-      }
-      // if person moves away from the book (greater beacon distance)
-      else if (this.beaconDistance > previousDistance) {
-        this.floorPlan[currentPositionY][currentPositionX] = '.'        // remove the user from the current position on the map
-        let distanceDifference = previousDistance - this.beaconDistance;     // calculate how much the person moved
-        let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
-        currentPositionY += distanceToMove;                             // update map by moving the person backwards
-      }
-      
-      previousDistance = this.beaconDistance;                                // update distance to book 
-      this.floorPlan[currentPositionY][currentPositionX] = '1'          // reset the user to the new position on the map
-      
-      this.beaconDistance -= 0.5;
-        
-    }, 1000);
+    // check if person has reached the book (currently set at a random threshold or if they are on the same square)
+    if(this.beaconDistance < 0.01 || (currentPositionX == this.beaconX && currentPositionY == this.beaconY)) {
+      console.log("book reached");
+      this.bookReached = true;
+    }
+    // if person moves towards the book (smaller beacon distance)
+    else if(this.beaconDistance < previousDistance) {
+      this.floorPlan[currentPositionY][currentPositionX] = '.'        // remove the user from the current position on the map
+      let distanceDifference = previousDistance - this.beaconDistance;     // calculate how much the person moved
+      let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
+      currentPositionY -= distanceToMove;                             // update map by moving the person forward
+    }
+    // if person moves away from the book (greater beacon distance)
+    else if (this.beaconDistance > previousDistance) {
+      this.floorPlan[currentPositionY][currentPositionX] = '.'        // remove the user from the current position on the map
+      let distanceDifference = previousDistance - this.beaconDistance;     // calculate how much the person moved
+      let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
+      currentPositionY += distanceToMove;                             // update map by moving the person backwards
+    }
+    
+    previousDistance = this.beaconDistance;                                // update distance to book 
+    this.floorPlan[currentPositionY][currentPositionX] = '1'          // reset the user to the new position on the map
     
   }
 
