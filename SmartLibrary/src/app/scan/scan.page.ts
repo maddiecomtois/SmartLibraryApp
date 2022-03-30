@@ -29,6 +29,8 @@ export class ScanPage implements OnInit {
        this.readerMode$ = this.nfc.readerMode(flags).subscribe(
            tag => this.scanResponse = JSON.stringify(tag),
            err => this.scanResponse = 'Error reading tag'
+
+           //API call...
        );
     }
     
