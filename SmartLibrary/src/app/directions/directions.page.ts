@@ -24,6 +24,8 @@ export class DirectionsPage implements OnInit {
   beaconX = 3;
   beaconY = 30;
   previousDistance:number = 0;
+
+  numberOfResponses:number = 0;
   
   constructor(private ngZone: NgZone, private deviceOrientation: DeviceOrientation, private smartBeacon: SmartBeaconPlugin, private androidPermissions: AndroidPermissions) { }
 
@@ -82,8 +84,10 @@ export class DirectionsPage implements OnInit {
     }
   }
 
-  onScanResult(result){
+  async onScanResult(result){
     console.log(result.length);
+    this.numberOfResponses++; 
+    this.scanStatus = "Response: " + this.numberOfResponses.toString();
     let latestBeacon = result[result.length - 1];
     this.updateMap(latestBeacon.distance);
   }
@@ -118,7 +122,7 @@ export class DirectionsPage implements OnInit {
     Y range: {0-49} ~25m
     X range: {0-19} ~10m
   */
-  updateMap(beaconDistance:String) {
+  async updateMap(beaconDistance:String) {
     this.beaconDistance = +beaconDistance;
     
     // function that automatically decreases beacon distance by 0.5m every 1 second

@@ -20,6 +20,10 @@ export class SearchPage implements OnInit {
       this.bookList = result;
     });
   }
+
+  chooseBook(bookId:number){
+    console.log(bookId);
+  }
 }
 
 export interface Book {

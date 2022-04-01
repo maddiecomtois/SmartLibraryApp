@@ -26,7 +26,9 @@ export class LoginPage implements OnInit {
     if(this.user.username != "" && this.user.password != ""){
       this.loginService.loginUser(this.user).subscribe(response => {
         if(response){
+          console.log(response);
           localStorage.setItem("sessionToken", response['token']);
+          localStorage.setItem("userId", '1')
           this.router.navigate(['/home']);
         }
       })

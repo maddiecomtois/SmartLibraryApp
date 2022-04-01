@@ -23,7 +23,7 @@
     "@awesome-cordova-plugins/core": "^5.39.1",
     "@awesome-cordova-plugins/device-orientation": "^5.40.0",
     "@awesome-cordova-plugins/nfc": "^5.39.1",
-    "@capacitor/android": "3.4.1",
+    "@capacitor/android": "3.4.3",
     "@capacitor/app": "1.1.0",
     "@capacitor/core": "^3.4.1",
     "@capacitor/haptics": "1.1.4",
