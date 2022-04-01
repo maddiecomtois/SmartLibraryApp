@@ -2,6 +2,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { SmartBeaconPlugin } from '@ionic-native/smart-beacon-plugin/ngx';
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@awesome-cordova-plugins/device-orientation/ngx';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
+import { BookService } from '../services/book.service';
 
 @Component({
   selector: 'app-directions',
@@ -21,11 +22,25 @@ export class DirectionsPage implements OnInit {
   beaconDistance:number = 0;
   currentPositionY = 49;
   currentPositionX = 10;
-  beaconX = 3;
-  beaconY = 30;
+
+  // will update in ngInit
+  beaconX = 0;
+  beaconY = 0;
   previousDistance:number = 0;
+
+  beacons:any = [{
+    "beaconId": 1001,
+    "x_coordinate": 3,
+    "y_coordincate": 30
+  }, {
+    "beaconId": 1002,
+    "x_cooridinate": 10,
+    "y_coordinate": 10
+  }]
+
+  numberOfResponses:number = 0;
   
-  constructor(private ngZone: NgZone, private deviceOrientation: DeviceOrientation, private smartBeacon: SmartBeaconPlugin, private androidPermissions: AndroidPermissions) { }
+  constructor(private ngZone: NgZone, private deviceOrientation: DeviceOrientation, private smartBeacon: SmartBeaconPlugin, private androidPermissions: AndroidPermissions, private bookService: BookService) { }
 
   ngOnInit() {
     let options = {
@@ -51,7 +66,11 @@ export class DirectionsPage implements OnInit {
     }
     this.floorPlan[this.beaconY][this.beaconX] = "@";
     console.log(this.floorPlan);
-    //this.updateMap();
+
+    // get target beacon
+    let beacon = this.beacons.find(i => i.beaconId === this.bookService.currentBeacon);
+    this.beaconX = beacon['x_coordinate'];
+    this.beaconY = beacon['y_coordinate'];
     this.smartBeaconScan();
   }
 
@@ -82,10 +101,13 @@ export class DirectionsPage implements OnInit {
     }
   }
 
-  onScanResult(result){
+  async onScanResult(result){
     console.log(result.length);
-    let latestBeacon = result[result.length - 1];
-    this.updateMap(latestBeacon.distance);
+    for(let i = 0; i < result.length; i++){
+      if(result[i].url == this.bookService.currentBeacon){
+        this.updateMap(result[i].distance);
+      } 
+    }
   }
 
   smartBeaconScan(){
@@ -94,11 +116,9 @@ export class DirectionsPage implements OnInit {
       result => {
         if(result.hasPermission){
           //this.scanStatus = "Starting Scan";
-          setInterval(() => {
-            this.smartBeacon.scan().then(result => {
-              this.onScanResult(result);
-            });
-          }, 2000);
+          this.smartBeacon.scan().then(result => {
+            this.onScanResult(result);
+          });
         }
         else{
           this.androidPermissions.requestPermissions(this.permissions)
@@ -118,7 +138,7 @@ export class DirectionsPage implements OnInit {
     Y range: {0-49} ~25m
     X range: {0-19} ~10m
   */
-  updateMap(beaconDistance:String) {
+  async updateMap(beaconDistance:String) {
     this.beaconDistance = +beaconDistance;
     
     // function that automatically decreases beacon distance by 0.5m every 1 second
@@ -126,6 +146,10 @@ export class DirectionsPage implements OnInit {
     if(this.beaconDistance < 0.01 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
       console.log("book reached");
       this.bookReached = true;
+      
+      //call LED endpoint
+
+
     }
     else {
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map

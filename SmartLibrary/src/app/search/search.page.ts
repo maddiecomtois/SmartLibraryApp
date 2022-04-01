@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BookService } from '../services/book.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -11,7 +12,7 @@ export class SearchPage implements OnInit {
   public bookList: Book[];
   public searchTerm: string;
 
-  constructor(private bookService: BookService) {
+  constructor(private bookService: BookService, private router:Router) {
   }
 
   ngOnInit() {
@@ -19,6 +20,12 @@ export class SearchPage implements OnInit {
       console.log(result);
       this.bookList = result;
     });
+  }
+
+  chooseBook(book:any){
+    this.bookService.currentBook = book;
+    this.bookService.currentBeacon = book.beaconId;
+    this.router.navigate(['/directions']);
   }
 }
 
