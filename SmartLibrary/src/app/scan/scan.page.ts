@@ -1,6 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { NFC, Ndef } from '@awesome-cordova-plugins/nfc/ngx';
 import { Platform } from '@ionic/angular';
+import { BookService } from '../services/book.service';
 
 @Component({
   selector: 'app-scan',
@@ -13,7 +14,7 @@ export class ScanPage implements OnInit {
   private readerMode$;
   private scanResponse = "no response"
 
-  constructor(private nfc: NFC, private ndef: Ndef, platform: Platform) {
+  constructor(private nfc: NFC, private ndef: Ndef, platform: Platform, private bookService: BookService) {
     this.platform = platform;
   }
 
@@ -27,10 +28,13 @@ export class ScanPage implements OnInit {
       console.log("android detected")
        let flags = this.nfc.FLAG_READER_NFC_A | this.nfc.FLAG_READER_NFC_V;
        this.readerMode$ = this.nfc.readerMode(flags).subscribe(
-           tag => this.scanResponse = JSON.stringify(tag),
+           tag => {
+            this.scanResponse = JSON.stringify(tag);
+            this.bookService.checkoutBook().subscribe(response => {
+              console.log(response);
+            });
+           },
            err => this.scanResponse = 'Error reading tag'
-
-           //API call...
        );
     }
     

@@ -8,7 +8,8 @@ import { Book } from '../search/search.page';
 })
 export class BookService {
 
-  chosenBookId: number = 0;
+  currentBook:any;
+  currentBeacon: number = 0;
 
   constructor(private httpClient: HttpClient) {
          
@@ -24,15 +25,16 @@ export class BookService {
     return this.httpClient.get(url);
   }
 
-  checkoutBook(book){
+  checkoutBook(){
     let url = 'https://smart-library-api.herokuapp.com/book-subscription';
     let bookSub = {
-      "bookId": book.id,
+      "bookId": this.currentBook.bookId,
       "userId": localStorage.getItem('userId'),
       "secret_token": localStorage.getItem('sessionToken'),
       "action": "subscribe"
     }    
-    this.httpClient.post<any>(url, bookSub);
+    console.log(bookSub);
+    return this.httpClient.post<any>(url, bookSub);
   }
    
 }
