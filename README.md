@@ -19,9 +19,9 @@ The browser verison of the code should be available at ```http://localhost:8100`
 - Certain permissions might need to be set up if using the camera etc.
 
 ```
-ionic build
 ionic cap copy
 ionic cap sync
+ionic cap run android (then select device/emulator)
 ```
 
 Apple iOS:  

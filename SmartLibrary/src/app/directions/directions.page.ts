@@ -131,6 +131,27 @@ export class DirectionsPage implements OnInit {
       console.log("book reached");
       this.bookReached = true;
     }
+    else {
+      this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
+      let distanceDifference = this.previousDistance - this.beaconDistance;     // calculate how much the person moved
+      let distanceToMove = Math.floor(distanceDifference / 0.5);                // translate that distance into 0.5 meter blocks
+      
+      if(this.heading == "South") {
+        this.currentPositionY += distanceToMove;    // moving forwards
+      }
+      else if (this.heading == "North") {
+        this.currentPositionY -= distanceToMove;    // moving backwards     
+      }
+      else if (this.heading == "West") {
+        this.currentPositionX += distanceToMove;    // moving right
+      }
+      else if (this.heading == "East") {
+        this.currentPositionX -= distanceToMove;    // moving left
+      }
+
+    }
+    
+    /*
     // if person moves towards the book (smaller beacon distance)
     else if(this.beaconDistance < this.previousDistance) {
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
@@ -145,6 +166,7 @@ export class DirectionsPage implements OnInit {
       let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
       this.currentPositionY += distanceToMove;                             // update map by moving the person backwards
     }
+    */
     
     this.previousDistance = this.beaconDistance;                                // update distance to book 
     this.floorPlan[this.currentPositionY][this.currentPositionX] = '1'          // reset the user to the new position on the map
