@@ -146,7 +146,7 @@ export class DirectionsPage implements OnInit {
     X range: {0-19} ~10m
   */
   async updateMap(beaconDistance:String) {
-    this.beaconDistance = +beaconDistance;
+    this.beaconDistance = Math.round(+beaconDistance*10)/10;
     
     // function that automatically decreases beacon distance by 0.5m every 1 second
     // check if person has reached the book (currently set at a random threshold or if they are on the same square)
