@@ -31,10 +31,10 @@ export class DirectionsPage implements OnInit {
   beacons:any = [{
     "beaconId": 1001,
     "x_coordinate": 3,
-    "y_coordincate": 30
+    "y_coordinate": 30
   }, {
     "beaconId": 1002,
-    "x_cooridinate": 10,
+    "x_coordinate": 10,
     "y_coordinate": 10
   }]
 
@@ -64,13 +64,19 @@ export class DirectionsPage implements OnInit {
             this.floorPlan[i][j] = '.';
         }
     }
-    this.floorPlan[this.beaconY][this.beaconX] = "@";
     console.log(this.floorPlan);
 
     // get target beacon
     let beacon = this.beacons.find(i => i.beaconId === this.bookService.currentBeacon);
     this.beaconX = beacon['x_coordinate'];
     this.beaconY = beacon['y_coordinate'];
+    this.floorPlan[this.beaconY][this.beaconX] = "@";
+
+    console.log(beacon);
+    console.log(this.beaconX);
+    console.log(this.beaconY);
+
+    //get initial distance
     this.smartBeaconScan();
   }
 
@@ -104,7 +110,7 @@ export class DirectionsPage implements OnInit {
   async onScanResult(result){
     console.log(result.length);
     for(let i = 0; i < result.length; i++){
-      if(result[i].url == this.bookService.currentBeacon){
+      if(result[i].minor == this.bookService.currentBeacon){
         this.updateMap(result[i].distance);
       } 
     }
@@ -143,12 +149,12 @@ export class DirectionsPage implements OnInit {
     
     // function that automatically decreases beacon distance by 0.5m every 1 second
     // check if person has reached the book (currently set at a random threshold or if they are on the same square)
-    if(this.beaconDistance < 0.01 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
+    if(this.beaconDistance < 1 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
       console.log("book reached");
       this.bookReached = true;
       
       //call LED endpoint
-
+      this.bookService.lightLed();
 
     }
     else {

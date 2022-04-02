@@ -11,14 +11,15 @@
 
   <p [innerHTML]="scanStatus"></p>
   <p>You are heading: </p><p [innerHTML]="heading"></p>
-  <ion-list>
+
+ <!--<ion-list>
     <ion-card-content ion-item *ngFor="let device of devices">
       <p>{{device.localName || "Unnamed"}}</p>
       <p>UUID: {{device.uuid}}</p>
       <p>RSSI: {{device.rssi}}</p>
       <p>Distance: {{device.distance}}</p>
     </ion-card-content>
-  </ion-list>
+  </ion-list>-->
 
   <!----------------------------------------------- NFC Scan --------------------------------------------------------->
   <div *ngIf="bookReached">

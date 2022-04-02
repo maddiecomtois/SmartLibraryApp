@@ -12,7 +12,7 @@ export class ScanPage implements OnInit {
   
   private platform: Platform;
   private readerMode$;
-  private scanResponse = "no response"
+  private scanResponse = "Click to scan book"
 
   constructor(private nfc: NFC, private ndef: Ndef, platform: Platform, private bookService: BookService) {
     this.platform = platform;
@@ -32,6 +32,9 @@ export class ScanPage implements OnInit {
             this.scanResponse = JSON.stringify(tag);
             this.bookService.checkoutBook().subscribe(response => {
               console.log(response);
+              if(response == "Success" || response == "success"){
+                this.scanResponse = "Book checked-out!"
+              }
             });
            },
            err => this.scanResponse = 'Error reading tag'
