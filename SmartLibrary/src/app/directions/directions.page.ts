@@ -48,6 +48,7 @@ export class DirectionsPage implements OnInit {
       frequency: 1000
     };
     
+    /*
     this.deviceOrientation.watchHeading(options).subscribe(
       (data: DeviceOrientationCompassHeading) => {
         this.heading = this.getDirectionFromHeading(data.trueHeading);
@@ -55,7 +56,7 @@ export class DirectionsPage implements OnInit {
       (error: any) => {
         console.log(error);
       }
-    );
+    );*/
         
     // create a 25m x 10m grid using 0.5m blocks
     for(let i:number = 0; i < 50; i++) {
@@ -158,6 +159,16 @@ export class DirectionsPage implements OnInit {
 
     }
     else {
+      //get current heading
+      this.deviceOrientation.getCurrentHeading().then(
+        (data: DeviceOrientationCompassHeading) => {
+          this.heading = this.getDirectionFromHeading(data.trueHeading);
+        },
+        (error: any) => {
+          console.log(error);
+        }
+      );
+
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
       let distanceDifference = this.previousDistance - this.beaconDistance;     // calculate how much the person moved
       let distanceToMove = Math.floor(distanceDifference / 0.5);                // translate that distance into 0.5 meter blocks
