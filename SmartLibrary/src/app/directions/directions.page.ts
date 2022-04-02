@@ -78,7 +78,15 @@ export class DirectionsPage implements OnInit {
     console.log(this.beaconY);
 
     //get initial distance
-    this.smartBeaconScan();
+    this.smartBeacon.scan().then(result => {
+      for(let i = 0; i < result.length; i++){
+        if(result[i].minor == this.bookService.currentBeacon){
+          this.previousDistance = result[i].distance;
+          this.beaconDistance = this.previousDistance;
+          break;
+        }
+      }
+    });
   }
 
   getDirectionFromHeading(heading){
