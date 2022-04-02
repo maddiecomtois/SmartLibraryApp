@@ -11,7 +11,7 @@ import { BookService } from '../services/book.service';
 })
 
 export class DirectionsPage implements OnInit {
-  devices:any[] = []
+  //devices:any[] = []
   scanStatus:String = '';
   bookReached:boolean = false;
   //heading:number = -1;
@@ -20,22 +20,25 @@ export class DirectionsPage implements OnInit {
   heading:String = '';
   floorPlan:string[][] = [];
   beaconDistance:number = 0;
-  currentPositionY = 49;
-  currentPositionX = 10;
+  currentPositionY = 9;
+  currentPositionX = 7;
+  
+  testMapping:number[] = [5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5 , 1, 0.5, 0.3]; 
+  testHeadings:String[] = ['North', 'North', 'North', 'North', 'North', 'East', 'North', 'East', 'North'];
 
   // will update in ngInit
   beaconX = 0;
   beaconY = 0;
-  previousDistance:number = 0;
+  previousDistance:number = 5;
 
   beacons:any = [{
     "beaconId": 1001,
-    "x_coordinate": 3,
-    "y_coordinate": 30
+    "x_coordinate": 0,
+    "y_coordinate": 0
   }, {
     "beaconId": 1002,
-    "x_coordinate": 10,
-    "y_coordinate": 10
+    "x_coordinate": 0,
+    "y_coordinate": 0
   }]
 
   numberOfResponses:number = 0;
@@ -43,11 +46,13 @@ export class DirectionsPage implements OnInit {
   constructor(private ngZone: NgZone, private deviceOrientation: DeviceOrientation, private smartBeacon: SmartBeaconPlugin, private androidPermissions: AndroidPermissions, private bookService: BookService) { }
 
   ngOnInit() {
+    console.log(this.testMapping);
     let options = {
       //every 1 second
       frequency: 1000
     };
     
+    /*
     this.deviceOrientation.watchHeading(options).subscribe(
       (data: DeviceOrientationCompassHeading) => {
         this.heading = this.getDirectionFromHeading(data.trueHeading);
@@ -55,29 +60,48 @@ export class DirectionsPage implements OnInit {
       (error: any) => {
         console.log(error);
       }
-    );
+    );*/
         
     // create a 25m x 10m grid using 0.5m blocks
-    for(let i:number = 0; i < 50; i++) {
+    for(let i:number = 0; i < 10; i++) {
         this.floorPlan[i] = [];
-        for(let j:number = 0; j< 20; j++) {
+        for(let j:number = 0; j< 13; j++) {
             this.floorPlan[i][j] = '.';
         }
     }
     console.log(this.floorPlan);
 
     // get target beacon
-    let beacon = this.beacons.find(i => i.beaconId === this.bookService.currentBeacon);
-    this.beaconX = beacon['x_coordinate'];
-    this.beaconY = beacon['y_coordinate'];
-    this.floorPlan[this.beaconY][this.beaconX] = "@";
+    //let beacon = this.beacons.find(i => i.beaconId === this.bookService.currentBeacon);
+    //this.beaconX = beacon['x_coordinate'];
+    //this.beaconY = beacon['y_coordinate'];
+    this.floorPlan[2][2] = "@";
+    this.floorPlan[7][10] = "@";
+    this.floorPlan[this.currentPositionY][this.currentPositionX] = '1'
+    
+    /*for(let i = 0; i < this.testMapping.length; i++){
+      (i => {
+        setTimeout(() => {
+          this.heading = this.testHeadings[i];
+          this.updateMap(this.testMapping[i].toString());
+        }, 1500 * (i+1));
+      })(i);
+    }*/
 
-    console.log(beacon);
+    //console.log(beacon);
     console.log(this.beaconX);
     console.log(this.beaconY);
 
     //get initial distance
-    this.smartBeaconScan();
+    this.smartBeacon.scan().then(result => {
+      for(let i = 0; i < result.length; i++){
+        if(result[i].minor == this.bookService.currentBeacon){
+          this.previousDistance = result[i].minor;
+          this.beaconDistance = this.previousDistance;
+          break;
+        }
+      }
+    })
   }
 
   getDirectionFromHeading(heading){
@@ -107,7 +131,7 @@ export class DirectionsPage implements OnInit {
     }
   }
 
-  async onScanResult(result){
+  onScanResult(result){
     console.log(result.length);
     for(let i = 0; i < result.length; i++){
       if(result[i].minor == this.bookService.currentBeacon){
@@ -121,7 +145,6 @@ export class DirectionsPage implements OnInit {
     this.androidPermissions.hasPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION).then(
       result => {
         if(result.hasPermission){
-          //this.scanStatus = "Starting Scan";
           this.smartBeacon.scan().then(result => {
             this.onScanResult(result);
           });
@@ -133,23 +156,24 @@ export class DirectionsPage implements OnInit {
     );
   }
 
+  /*
   deviceFound(device){
     //this.scanStatus = device.id;
     this.ngZone.run(() => {
       this.devices.push(device);
     })
-  }
+  }*/
   
   /*
     Y range: {0-49} ~25m
     X range: {0-19} ~10m
   */
-  async updateMap(beaconDistance:String) {
-    this.beaconDistance = +beaconDistance;
+  updateMap(beaconDistance:String) {
+    this.beaconDistance = Math.round(+beaconDistance*10)/10;
     
     // function that automatically decreases beacon distance by 0.5m every 1 second
     // check if person has reached the book (currently set at a random threshold or if they are on the same square)
-    if(this.beaconDistance < 1 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
+    if(this.beaconDistance < 0.5 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
       console.log("book reached");
       this.bookReached = true;
       
@@ -158,26 +182,46 @@ export class DirectionsPage implements OnInit {
 
     }
     else {
+      this.deviceOrientation.getCurrentHeading().then(
+        (data: DeviceOrientationCompassHeading) => {
+          this.heading = this.getDirectionFromHeading(data.trueHeading);
+        },
+        (error: any) => {
+          console.log(error);
+        }
+      );
+      
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
       let distanceDifference = this.previousDistance - this.beaconDistance;     // calculate how much the person moved
       let distanceToMove = Math.floor(distanceDifference / 0.5);                // translate that distance into 0.5 meter blocks
       
       if(this.heading == "South") {
-        this.currentPositionY += distanceToMove;    // moving forwards
+        if((this.currentPositionY += distanceToMove) >= 0){
+            this.currentPositionY += distanceToMove;    // moving forwards
+            console.log(this.currentPositionY);
+        }
       }
       else if (this.heading == "North") {
-        this.currentPositionY -= distanceToMove;    // moving backwards     
+        if((this.currentPositionY -= distanceToMove) <= 13){
+          this.currentPositionY -= distanceToMove;    // moving backwards     
+        }
       }
       else if (this.heading == "West") {
-        this.currentPositionX += distanceToMove;    // moving right
+        if((this.currentPositionX += distanceToMove) <= 10){
+          this.currentPositionX += distanceToMove;    // moving right
+          
+        }
       }
       else if (this.heading == "East") {
-        this.currentPositionX -= distanceToMove;    // moving left
+        if((this.currentPositionX -= distanceToMove) >=0){
+          this.currentPositionX -= distanceToMove;    // moving left
+        }
       }
-
     }
     
     /*
+
+    }
     // if person moves towards the book (smaller beacon distance)
     else if(this.beaconDistance < this.previousDistance) {
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
@@ -196,7 +240,8 @@ export class DirectionsPage implements OnInit {
     
     this.previousDistance = this.beaconDistance;                                // update distance to book 
     this.floorPlan[this.currentPositionY][this.currentPositionX] = '1'          // reset the user to the new position on the map
-        
+  
+    console.log("MAP UPDATED");
   }
 
 }
