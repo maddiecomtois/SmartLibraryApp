@@ -38,7 +38,7 @@ export class BookService {
   }
 
   lightLed(){
-    let url = 'https://smart-library-api.herokuapp.com/user-proximity?userId=' + localStorage.getItem("userId") + "&beaconId=" + this.currentBeacon.toString();
+    let url = 'https://smart-library-api.herokuapp.com/user-proximity?userId=' + localStorage.getItem("userId") + "&beaconId=" + this.currentBeacon;
     return this.httpClient.get(url);
   }
    

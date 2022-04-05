@@ -7,7 +7,7 @@
 <ion-content>
   <!----------------------------------------------- iBeacon Scan --------------------------------------------------------->
   Scan for beacon device to get distance:<br>
-  <ion-button (click)=smartBeaconScan()><ion-icon name='Bluetooth'></ion-icon>Scan</ion-button>
+  <ion-button (click)=smartBeaconScan()><ion-icon name='Bluetooth'></ion-icon>Scan for Distance</ion-button>
 
   <p [innerHTML]="scanStatus"></p>
   <p>You are heading: </p><p [innerHTML]="heading"></p>
@@ -30,11 +30,12 @@
   <!----------------------------------------------- Map --------------------------------------------------------->
 
   <div> Distance to go: {{beaconDistance}}m </div><br>
-  <div class= "mapContainer" *ngFor="let i of floorPlan">
-      <div *ngFor="let j of i">
-          <div *ngIf="j == '@'" class="mapCell"><ion-icon name="book-outline"></ion-icon></div>
-          <div *ngIf="j == '1'" class="mapCell"><ion-icon name="man-outline"></ion-icon></div>
-          <div *ngIf="j != '1' && j != '@'" class="mapCell">{{j}}</div>
+  <div class= "mapContainer" *ngFor="let row of floorPlan; let i = index;">
+      <div *ngFor="let col of row; let j = index;">
+          <div *ngIf="col == '@' && isBeaconCoordinate(i, j)" id='target' class="mapCell"><ion-icon name="book-outline"></ion-icon></div>
+          <div *ngIf="col == '@' && !isBeaconCoordinate(i, j)" class="mapCell"><ion-icon name="book-outline"></ion-icon></div>
+          <div *ngIf="col == '1'" class="mapCell"><ion-icon name="man-outline"></ion-icon></div>
+          <div *ngIf="col != '1' && col != '@'" class="mapCell">{{col}}</div>
       </div>
   </div>
 
