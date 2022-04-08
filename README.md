@@ -1,10 +1,18 @@
 # SmartLibraryApp
 
-### To Run the project: 
-Download the Ionic CLI with NPM 
+### To Run the project on the Web: 
+Download the Ionic CLI with NPM, and install packages using npm i
 ```
 npm install -g @ionic/cli
+npm i
 ```
+
+Also install the **custom smart beacon plugin** incase it isn't downloaded with npm i:
+```
+npm i https://github.com/chaitu25/SmartBeaconPlugin.git
+```
+
+**You also need to add the ```smart-beacon-plugin``` folder into the ```node-modules/@ionic-native/``` folder of the project.**
 
 Start the Ionic Server <br>
    ```
@@ -24,6 +32,7 @@ ionic cap sync
 ionic cap run android (then select device/emulator)
 ```
 
+### To open code in IDE
 Apple iOS:  
 Install Xcode then run the following command
 ```
