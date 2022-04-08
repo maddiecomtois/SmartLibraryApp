@@ -7,7 +7,7 @@ npm install -g @ionic/cli
 npm i
 ```
 
-Also install the custom smart beacon plugin incase it isn't downloaded with npm i:
+Also install the **custom smart beacon plugin** incase it isn't downloaded with npm i:
 ```
 npm i https://github.com/chaitu25/SmartBeaconPlugin.git
 ```
