@@ -16,14 +16,14 @@ export class DirectionsPage implements OnInit {
   coordinates = '0 0';
   toMove = 0;
   bookReached:boolean = false;
-  //heading:number = -1;
+
   permissions:any[] = [this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT, this.androidPermissions.PERMISSION.BLUETOOTH_ADVERTISE, this.androidPermissions.PERMISSION.BLUETOOTH_SCAN, this.androidPermissions.PERMISSION.FOREGROUND_SERVICE, this.androidPermissions.PERMISSION.INTERNET, this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION, this.androidPermissions.PERMISSION.ACCESS_BACKGROUND_LOCATION] 
 
   heading:String = '';
   floorPlan:string[][] = [];
   beaconDistance:number = 0;
-  currentPositionY = 49;
-  currentPositionX = 10;
+  currentPositionY:number = 0;
+  currentPositionX:number = 0;
   beacons:any = [];
 
   // will update in ngInit
@@ -57,7 +57,7 @@ export class DirectionsPage implements OnInit {
             this.floorPlan[i][j] = '.';
         }
     }
-    console.log(this.floorPlan);
+    //console.log(this.floorPlan);
 
     // get target beacon
     let beacon = this.beacons.find(i => i.beaconId === this.bookService.currentBeacon);
@@ -82,6 +82,7 @@ export class DirectionsPage implements OnInit {
         }
       }
     });
+    this.scanStatus = this.bookService.currentBeacon.toString();
 
     this.smartBeaconScan();
   }
@@ -127,8 +128,10 @@ export class DirectionsPage implements OnInit {
   }
 
   smartBeaconScan(){
-    this.smartBeacon.scan().then(result => {
-      this.onScanResult(result);
+    setInterval(() => {
+      this.smartBeacon.scan().then(result => {
+        this.onScanResult(result);
+      });
     });
   }
 
@@ -138,14 +141,18 @@ export class DirectionsPage implements OnInit {
     X range: {0-19} ~10m
   */
   updateMap(beaconDistance:String) {
-    this.scanStatus = "XCOORD: " + this.currentPositionX;
     this.beaconDistance = Math.round(+beaconDistance*10)/10;
     
     // function that automatically decreases beacon distance by 0.5m every 1 second
     // check if person has reached the book (currently set at a random threshold or if they are on the same square)
-    if(this.beaconDistance <= 0.3 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
+    if(this.beaconDistance <= 1.5 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
       console.log("book reached");
       this.bookReached = true;
+
+      this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
+
+      this.currentPositionX = this.beaconX + 2;
+      this.currentPositionY = this.beaconY - 2;
       
       //call LED endpoint
       this.bookService.lightLed().subscribe(response => {
@@ -156,7 +163,12 @@ export class DirectionsPage implements OnInit {
       //get current heading
       this.deviceOrientation.getCurrentHeading().then(
         (data: DeviceOrientationCompassHeading) => {
-          this.heading = this.getDirectionFromHeading(data.trueHeading);
+          if(this.getDirectionFromHeading(data.trueHeading) == "North"){
+            this.heading = "South";
+          }
+          else{
+            this.heading = this.getDirectionFromHeading(data.trueHeading);
+          }
         },
         (error: any) => {
           console.log(error);
@@ -165,27 +177,37 @@ export class DirectionsPage implements OnInit {
 
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
       let distanceDifference = this.previousDistance - this.beaconDistance;     // calculate how much the person moved
-      let distanceToMove = Math.floor(distanceDifference / 0.5);                // translate that distance into 0.5 meter blocks
+      let distanceToMove = Math.abs(Math.ceil(distanceDifference / 0.5));                // translate that distance into 0.5 meter blocks
       
+      this.toMove = +distanceToMove;
       //this.scanStatus = this.currentPositionY.toString();
-      this.toMove = distanceToMove;
+      //this.toMove = distanceToMove;
 
-      if(this.heading == "South" || this.heading == "South West" || this.heading == "South East") {
+      if(this.heading == "South" || this.heading == "South West") {
+        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionY - distanceToMove) <= 49){
           this.currentPositionY -= distanceToMove;    // moving forwards
         }
       }
+      else if(this.heading == "South East"){
+        if((this.currentPositionX - distanceToMove) >= 0){
+          this.currentPositionX -= distanceToMove;    // moving left
+        }
+      }
       else if (this.heading == "North") {
+        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionY + distanceToMove >= 0)){
           this.currentPositionY += distanceToMove;    // moving backwards     
         }
       }
       else if (this.heading == "West") {
+        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionX + distanceToMove) <= 19){
           this.currentPositionX += distanceToMove;    // moving right
         }
       }
       else if (this.heading == "East") {
+        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionX - distanceToMove) >= 0){
           this.currentPositionX -= distanceToMove;    // moving left
         }
@@ -197,23 +219,6 @@ export class DirectionsPage implements OnInit {
     this.floorPlan[this.currentPositionY][this.currentPositionX] = '1'          // reset the user to the new position on the map
 
     //this.coordinates = this.currentPositionY.toString() + " " + this.currentPositionX.toString();
-    
-    /*
-    // if person moves towards the book (smaller beacon distance)
-    else if(this.beaconDistance < this.previousDistance) {
-      this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
-      let distanceDifference = this.previousDistance - this.beaconDistance;     // calculate how much the person moved
-      let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
-      this.currentPositionY -= distanceToMove;                             // update map by moving the person forward
-    }
-    // if person moves away from the book (greater beacon distance)
-    else if (this.beaconDistance > this.previousDistance) {
-      this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
-      let distanceDifference = this.previousDistance - this.beaconDistance;     // calculate how much the person moved
-      let distanceToMove = Math.floor(distanceDifference / 0.5);      // translate that distance into 0.5 meter blocks
-      this.currentPositionY += distanceToMove;                             // update map by moving the person backwards
-    }
-    */
   }
 
 }

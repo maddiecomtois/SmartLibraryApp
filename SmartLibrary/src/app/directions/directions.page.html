@@ -6,11 +6,12 @@
 
 <ion-content>
   <!----------------------------------------------- iBeacon Scan --------------------------------------------------------->
-  Scan for beacon device to get distance:<br>
-  <ion-button (click)=smartBeaconScan()><ion-icon name='Bluetooth'></ion-icon>Scan for Distance</ion-button>
+  <ion-button (click)=smartBeaconScan()><ion-icon name='Bluetooth'></ion-icon>Get Directions</ion-button>
+  <p>Head towards the <i class="fa-solid fa-book" style="color:green;"></i></p>
 
-  <p [innerHTML]="scanStatus"></p>
-  <p>You are heading: </p><p [innerHTML]="heading"></p>
+  <!--<p [innerHTML]="scanStatus"></p>
+  <p [innerHTML]="toMove"></p>-->
+  <p>You are heading: {{heading}}</p>
 
  <!--<ion-list>
     <ion-card-content ion-item *ngFor="let device of devices">
@@ -30,13 +31,16 @@
   <!----------------------------------------------- Map --------------------------------------------------------->
 
   <div> Distance to go: {{beaconDistance}}m </div><br>
-  <div class= "mapContainer" *ngFor="let row of floorPlan; let i = index;">
+  <div class="map">
+    <div class= "mapContainer" *ngFor="let row of floorPlan; let i = index;">
       <div *ngFor="let col of row; let j = index;">
-          <div *ngIf="col == '@' && isBeaconCoordinate(i, j)" id='target' class="mapCell"><ion-icon name="book-outline"></ion-icon></div>
-          <div *ngIf="col == '@' && !isBeaconCoordinate(i, j)" class="mapCell"><ion-icon name="book-outline"></ion-icon></div>
-          <div *ngIf="col == '1'" class="mapCell"><ion-icon name="man-outline"></ion-icon></div>
-          <div *ngIf="col != '1' && col != '@'" class="mapCell">{{col}}</div>
+          <div *ngIf="col == '@' && isBeaconCoordinate(i, j)" id='target' class="mapCell"><i class="fa-solid fa-book" style="font-size:20px"></i></div>
+          <div *ngIf="col == '@' && !isBeaconCoordinate(i, j)" class="mapCell"><i class="fa-solid fa-book" style="font-size:20px"></i></div>
+          <div *ngIf="col == '1'" class="mapCell"><ion-icon name="man-outline" style="font-size:30px"></ion-icon></div>
+          <div *ngIf="col != '1' && col != '@'" class="mapCell">{{col}}</div> 
       </div>
+    </div>
+  <!--<i class="fa-solid fa-door-open"></i>-->
   </div>
 
 </ion-content>

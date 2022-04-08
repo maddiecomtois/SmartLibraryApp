@@ -1,13 +1,19 @@
 .mapContainer {
     display: grid;
-    grid-template-columns: 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px 15px;
-}
+    grid-template-columns: 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px 17px;
+  }
 
 .mapCell {
-  width:15px;
-  height:15px;
+  width:7px;
+  height:7px;
 }
 
 #target{
-  background-color: chartreuse;
+  color: green;
+}
+
+.map{
+  border: 1px solid;
+  padding-bottom: 20px;
+  padding-right: 15px;
 }
