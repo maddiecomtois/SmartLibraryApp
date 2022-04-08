@@ -15,6 +15,9 @@ export class SearchPage implements OnInit {
   constructor(private bookService: BookService, private router:Router) {
   }
 
+  /*
+  * Get book catalogue from the data base
+  */
   ngOnInit() {
     this.bookService.getBooks().subscribe((result:Book[]) => {
       console.log(result);
@@ -22,6 +25,9 @@ export class SearchPage implements OnInit {
     });
   }
 
+  /*
+  * Route user to the directions page based on the book they have selected
+  */
   chooseBook(book:any){
     this.bookService.currentBook = book;
     this.bookService.currentBeacon = book.beaconId;

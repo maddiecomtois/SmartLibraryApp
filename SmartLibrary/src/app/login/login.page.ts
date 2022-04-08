@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../services/login.service';
 
@@ -7,7 +7,7 @@ import { LoginService } from '../services/login.service';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   
   user = {
     username:'',
@@ -17,16 +17,14 @@ export class LoginPage implements OnInit {
   registerStatus:String = '';
 
   constructor(private router:Router, private loginService: LoginService) { }
-
-  ngOnInit() {
-  }
   
+  /*
+  * Log in the user and set a session token
+  */
   async logIn() {
-    // code for logging in user
     if(this.user.username != "" && this.user.password != ""){
       this.loginService.loginUser(this.user).subscribe(response => {
         if(response){
-          console.log(response);
           localStorage.setItem("sessionToken", response['token']);
           localStorage.setItem("userId", '1')
           this.router.navigate(['/home']);
@@ -35,10 +33,12 @@ export class LoginPage implements OnInit {
     }
   }
   
+  /*
+  * Register a user then prompt log in
+  */
   async register() {
     if(this.user.username != "" && this.user.password != ""){
       this.loginService.registerNewUser(this.user).subscribe(response => {
-        console.log(response);
         if(response == "Signup successful!"){
           this.registerStatus = response + " Please Login."  
         }

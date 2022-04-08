@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { NFC, Ndef } from '@awesome-cordova-plugins/nfc/ngx';
 import { Platform } from '@ionic/angular';
 import { BookService } from '../services/book.service';
@@ -8,7 +8,7 @@ import { BookService } from '../services/book.service';
   templateUrl: './scan.page.html',
   styleUrls: ['./scan.page.scss'],
 })
-export class ScanPage implements OnInit {
+export class ScanPage {
   
   private platform: Platform;
   private readerMode$;
@@ -17,12 +17,11 @@ export class ScanPage implements OnInit {
   constructor(private nfc: NFC, private ndef: Ndef, platform: Platform, private bookService: BookService) {
     this.platform = platform;
   }
-
-  ngOnInit() {
-  }
   
+  /*
+  * Use NFC to scan the book tag (Android only)
+  */
   async scanTag() {
-    // Read NFC Tag - Android
     // Once the reader mode is enabled, any tags that are scanned are sent to the subscriber
     if(this.platform.is('android')) {
       console.log("android detected")

@@ -11,6 +11,8 @@ import { BookService } from '../services/book.service';
 })
 
 export class DirectionsPage implements OnInit {
+  
+  // variables to move the user
   devices:any[] = []
   scanStatus:String = '';
   coordinates = '0 0';
@@ -19,6 +21,7 @@ export class DirectionsPage implements OnInit {
 
   permissions:any[] = [this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT, this.androidPermissions.PERMISSION.BLUETOOTH_ADVERTISE, this.androidPermissions.PERMISSION.BLUETOOTH_SCAN, this.androidPermissions.PERMISSION.FOREGROUND_SERVICE, this.androidPermissions.PERMISSION.INTERNET, this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION, this.androidPermissions.PERMISSION.ACCESS_BACKGROUND_LOCATION] 
 
+  // variables for map
   heading:String = '';
   floorPlan:string[][] = [];
   beaconDistance:number = 0;
@@ -26,15 +29,19 @@ export class DirectionsPage implements OnInit {
   currentPositionX:number = 0;
   beacons:any = [];
 
-  // will update in ngInit
+  // variables for beacons
   beaconX = 0;
   beaconY = 0;
   previousDistance:number = 0;
-
   numberOfResponses:number = 0;
   
-  constructor(private ngZone: NgZone, private deviceOrientation: DeviceOrientation, private smartBeacon: SmartBeaconPlugin, private androidPermissions: AndroidPermissions, private bookService: BookService) { }
+  constructor(private ngZone: NgZone, private deviceOrientation: DeviceOrientation, 
+              private smartBeacon: SmartBeaconPlugin, private androidPermissions: AndroidPermissions, 
+              private bookService: BookService) { }
 
+  /*
+  * Create the map, load in beacons, and get the user position
+  */
   ngOnInit() {
     this.beacons = [{
       "beaconId": 1001,
@@ -46,6 +53,7 @@ export class DirectionsPage implements OnInit {
       "y_coordinate": 10
     }];
 
+    // set initial position of user
     this.currentPositionX = 10;
     this.currentPositionY = 49;
     this.heading = 'South';
@@ -57,14 +65,13 @@ export class DirectionsPage implements OnInit {
             this.floorPlan[i][j] = '.';
         }
     }
-    //console.log(this.floorPlan);
 
-    // get target beacon
+    // get target beacon (book user is looking for)
     let beacon = this.beacons.find(i => i.beaconId === this.bookService.currentBeacon);
     this.beaconX = beacon['x_coordinate'];
     this.beaconY = beacon['y_coordinate'];
 
-    //set beacons and pointer on map
+    //set beacons and user pointer on map
     this.floorPlan[this.currentPositionY][this.currentPositionX] = '1';
     this.floorPlan[30][6] = '@';
     this.floorPlan[10][6] = '@';
@@ -72,7 +79,7 @@ export class DirectionsPage implements OnInit {
     //check permissions
     this.androidPermissions.requestPermissions(this.permissions);
 
-    //get initial distance
+    //get initial distance from user to beacon
     this.smartBeacon.scan().then(result => {
       for(let i = 0; i < result.length; i++){
         if(result[i].minor == this.bookService.currentBeacon){
@@ -86,11 +93,18 @@ export class DirectionsPage implements OnInit {
 
     this.smartBeaconScan();
   }
-
-  isBeaconCoordinate(i, j){;
+  
+  
+  /*
+  * Return whether or not coordinates match those of selected beacon
+  */
+  isBeaconCoordinate(i, j){
     return i == this.beaconY && j == this.beaconX;
   }
 
+  /*
+  * Use orientation degree of user to return direction
+  */
   getDirectionFromHeading(heading){
     if((heading >= 0 && heading <= 21) || (heading >= 337 && heading <= 360)){
       return "North";
@@ -118,6 +132,9 @@ export class DirectionsPage implements OnInit {
     }
   }
 
+  /*
+  * Update directions once beacon is detected
+  */
   onScanResult(result){
     console.log(result.length);
     for(let i = 0; i < result.length; i++){
@@ -127,6 +144,9 @@ export class DirectionsPage implements OnInit {
     }
   }
 
+  /*
+  * Scan for beacons
+  */
   smartBeaconScan(){
     setInterval(() => {
       this.smartBeacon.scan().then(result => {
@@ -137,18 +157,17 @@ export class DirectionsPage implements OnInit {
 
 
   /*
-    Y range: {0-49} ~25m
-    X range: {0-19} ~10m
+  * Update the map as the user approaches the book
+  *  Y range: {0-49} ~25m
+  *  X range: {0-19} ~10m
   */
   updateMap(beaconDistance:String) {
+    // get distance to beacon
     this.beaconDistance = Math.round(+beaconDistance*10)/10;
     
-    // function that automatically decreases beacon distance by 0.5m every 1 second
-    // check if person has reached the book (currently set at a random threshold or if they are on the same square)
+    // check if person has reached the book or is in within 1.5m of the book, otherwise update user position
     if(this.beaconDistance <= 1.5 || (this.currentPositionX == this.beaconX && this.currentPositionY == this.beaconY)) {
-      console.log("book reached");
       this.bookReached = true;
-
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
 
       this.currentPositionX = this.beaconX + 2;
@@ -177,14 +196,12 @@ export class DirectionsPage implements OnInit {
 
       this.floorPlan[this.currentPositionY][this.currentPositionX] = '.'        // remove the user from the current position on the map
       let distanceDifference = this.previousDistance - this.beaconDistance;     // calculate how much the person moved
-      let distanceToMove = Math.abs(Math.ceil(distanceDifference / 0.5));                // translate that distance into 0.5 meter blocks
+      let distanceToMove = Math.abs(Math.ceil(distanceDifference / 0.5));       // translate that distance into 0.5 meter blocks
       
       this.toMove = +distanceToMove;
-      //this.scanStatus = this.currentPositionY.toString();
-      //this.toMove = distanceToMove;
 
+      // update the user coordinates based on the direction and distance to move
       if(this.heading == "South" || this.heading == "South West") {
-        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionY - distanceToMove) <= 49){
           this.currentPositionY -= distanceToMove;    // moving forwards
         }
@@ -195,19 +212,16 @@ export class DirectionsPage implements OnInit {
         }
       }
       else if (this.heading == "North") {
-        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionY + distanceToMove >= 0)){
           this.currentPositionY += distanceToMove;    // moving backwards     
         }
       }
       else if (this.heading == "West") {
-        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionX + distanceToMove) <= 19){
           this.currentPositionX += distanceToMove;    // moving right
         }
       }
       else if (this.heading == "East") {
-        this.scanStatus = "*HEADING!!!!!:      " + this.heading;
         if((this.currentPositionX - distanceToMove) >= 0){
           this.currentPositionX -= distanceToMove;    // moving left
         }
@@ -215,10 +229,9 @@ export class DirectionsPage implements OnInit {
 
     }
 
-    this.previousDistance = this.beaconDistance;                                // update distance to book 
-    this.floorPlan[this.currentPositionY][this.currentPositionX] = '1'          // reset the user to the new position on the map
+    this.previousDistance = this.beaconDistance;                                // update previous distance to book 
+    this.floorPlan[this.currentPositionY][this.currentPositionX] = '1'          // reset the user icon to the new position on the map
 
-    //this.coordinates = this.currentPositionY.toString() + " " + this.currentPositionX.toString();
   }
 
 }

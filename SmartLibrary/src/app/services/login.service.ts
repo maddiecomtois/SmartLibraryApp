@@ -8,6 +8,9 @@ export class LoginService {
 
   constructor(private http: HttpClient) { }
 
+  /*
+  * POST request: register a new user in the data base
+  */
   registerNewUser(user){
     var userObj = {
       "firstName": "",
@@ -19,6 +22,9 @@ export class LoginService {
     return this.http.post<any>("https://smart-library-api.herokuapp.com/signup", userObj);
   }
 
+  /*
+  * POST request: log in a user given their credentials
+  */
   loginUser(user){
     var userObj = {
       "email": user.username, 

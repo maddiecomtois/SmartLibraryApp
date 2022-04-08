@@ -13,10 +13,11 @@ export class HomePage {
     this.loadBooks();
   }
 
+  /*
+  * Load in the books
+  */
   loadBooks(){
-    //console.log(localStorage.getItem("sessionToken"));
     this.bookService.getMyBooks().subscribe((result:Book[]) => {
-      console.log(result);
       this.bookList = result;
     });
   }

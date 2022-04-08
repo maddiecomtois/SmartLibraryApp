@@ -9,18 +9,18 @@
   <ion-button (click)=smartBeaconScan()><ion-icon name='Bluetooth'></ion-icon>Get Directions</ion-button>
   <p>Head towards the <i class="fa-solid fa-book" style="color:green;"></i></p>
 
-  <!--<p [innerHTML]="scanStatus"></p>
-  <p [innerHTML]="toMove"></p>-->
   <p>You are heading: {{heading}}</p>
 
- <!--<ion-list>
+ <!-- Informatoin about the beacons
+ <ion-list>
     <ion-card-content ion-item *ngFor="let device of devices">
       <p>{{device.localName || "Unnamed"}}</p>
       <p>UUID: {{device.uuid}}</p>
       <p>RSSI: {{device.rssi}}</p>
       <p>Distance: {{device.distance}}</p>
     </ion-card-content>
-  </ion-list>-->
+  </ion-list>
+  -->
 
   <!----------------------------------------------- NFC Scan --------------------------------------------------------->
   <div *ngIf="bookReached">
@@ -40,7 +40,6 @@
           <div *ngIf="col != '1' && col != '@'" class="mapCell">{{col}}</div> 
       </div>
     </div>
-  <!--<i class="fa-solid fa-door-open"></i>-->
   </div>
 
 </ion-content>
